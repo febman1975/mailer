@@ -3,7 +3,7 @@ import { renderTemplate } from "./services/template.js";
 
 const transporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST,
-  port: Number(process.env.SMTP_PORT || 587),
+  port: Number(process.env.SMTP_PORT),
   secure: false,
   auth: {
     user: process.env.SMTP_USER,
@@ -11,15 +11,15 @@ const transporter = nodemailer.createTransport({
   }
 });
 
-export async function sendMail({ to, subject, template, data = {}, from }) {
+export async function sendMail({ to, subject, template, data, from }) {
   if (!template) {
     throw new Error("Template is required");
   }
 
   const html = renderTemplate(template, data);
 
-  return transporter.sendMail({
-    from: from || process.env.MAIL_FROM,
+  await transporter.sendMail({
+    from: from || `"Mailer" <${process.env.FROM_EMAIL}>`,
     to,
     subject,
     html
