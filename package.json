@@ -2,21 +2,13 @@
   "name": "mailer",
   "version": "1.0.0",
   "type": "module",
-  "main": "index.js",
+  "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node server.js"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
   "dependencies": {
-    "body-parser": "^2.2.2",
-    "bullmq": "^5.69.3",
-    "express": "^5.2.1",
-    "handlebars": "^4.7.8",
-    "ioredis": "^5.9.3",
-    "nodemailer": "^8.0.1"
-  },
-  "description": ""
+    "express": "^4.19.2",
+    "nodemailer": "^6.9.13",
+    "handlebars": "^4.7.8"
+  }
 }
