@@ -2,54 +2,42 @@ import express from "express";
 import { sendMail } from "./mailer.js";
 
 const app = express();
-
-/**
- * Middleware
- */
 app.use(express.json());
 
 /**
- * Health check (Railway + browser)
+ * API KEY AUTH (REQUIRED)
  */
-app.get("/", (req, res) => {
-  res.status(200).json({
-    status: "ok",
-    service: "mailer",
-    uptime: process.uptime(),
-    timestamp: new Date().toISOString()
-  });
+app.use((req, res, next) => {
+  const auth = req.headers.authorization;
+
+  if (!auth || auth !== `Bearer ${process.env.API_KEY}`) {
+    return res.status(401).json({ error: "Unauthorized" });
+  }
+
+  next();
 });
 
 /**
- * Send email endpoint
+ * HEALTH CHECK (Railway friendly)
+ */
+app.get("/health", (req, res) => {
+  res.json({ status: "ok" });
+});
+
+/**
+ * SEND EMAIL
  */
 app.post("/send", async (req, res) => {
   try {
-    const { to, subject, template, data, from } = req.body;
-
-    if (!to || !subject || !template) {
-      return res.status(400).json({
-        error: "Missing required fields: to, subject, template"
-      });
-    }
-
-    await sendMail({ to, subject, template, data, from });
-
+    await sendMail(req.body);
     res.json({ status: "queued" });
   } catch (err) {
-    console.error("MAIL ERROR:", err);
-    res.status(500).json({
-      status: "error",
-      message: err.message
-    });
+    console.error(err);
+    res.status(500).json({ error: err.message });
   }
 });
 
-/**
- * Port (Railway injects PORT automatically)
- */
 const PORT = process.env.PORT || 3000;
-
 app.listen(PORT, () => {
   console.log(`Mailer API listening on port ${PORT}`);
 });
