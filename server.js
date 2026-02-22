@@ -1,8 +1,10 @@
 import express from "express";
+import bodyParser from "body-parser";
 import { sendMail } from "./mailer.js";
 
 const app = express();
-app.use(express.json());
+
+app.use(bodyParser.json());
 
 app.post("/send", async (req, res) => {
   try {
@@ -14,29 +16,12 @@ app.post("/send", async (req, res) => {
   }
 });
 
-const PORT = process.env.PORT || 3000;
-
-app.listen(PORT, () => {
-  console.log(`Mailer API listening on port ${PORT}`);
+app.get("/", (req, res) => {
+  res.send("Mailer API running");
 });
 
-import fs from "fs";
-import path from "path";
+const PORT = process.env.PORT || 3000;
 
-app.post("/templates", (req, res) => {
-  const { name, html } = req.body;
-
-  if (!name || !html) {
-    return res.status(400).json({ error: "name and html are required" });
-  }
-
-  const templatePath = path.join(
-    process.cwd(),
-    "templates",
-    `${name}.html`
-  );
-
-  fs.writeFileSync(templatePath, html, "utf8");
-
-  res.json({ status: "template saved", template: name });
+app.listen(PORT, "0.0.0.0", () => {
+  console.log(`Mailer API listening on port ${PORT}`);
 });
