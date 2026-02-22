@@ -1,24 +1,38 @@
 import express from "express";
+import bodyParser from "body-parser";
 import { sendMail } from "./mailer.js";
 
 const app = express();
-app.use(express.json());
 
-/**
- * REQUIRED FOR RAILWAY
- */
-app.get("/health", (req, res) => {
-  res.json({ status: "ok" });
+/* Middleware */
+app.use(bodyParser.json());
+
+/* Root route — REQUIRED for Railway */
+app.get("/", (req, res) => {
+  res.json({
+    status: "ok",
+    service: "mailer",
+    message: "Mailer API is running"
+  });
 });
 
-/**
- * SEND EMAIL
- */
+/* Health check — REQUIRED for Railway */
+app.get("/health", (req, res) => {
+  res.json({ status: "healthy" });
+});
+
+/* Send mail endpoint */
 app.post("/send", async (req, res) => {
   try {
     const { to, subject, template, data, from } = req.body;
 
-    await sendMail({ to, subject, template, data, from });
+    await sendMail({
+      to,
+      subject,
+      template,
+      data,
+      from
+    });
 
     res.json({ status: "queued" });
   } catch (err) {
@@ -27,7 +41,8 @@ app.post("/send", async (req, res) => {
   }
 });
 
+/* PORT HANDLING — Railway compatible */
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, "0.0.0.0", () => {
+app.listen(PORT, () => {
   console.log(`Mailer API listening on port ${PORT}`);
 });
