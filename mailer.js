@@ -1,3 +1,4 @@
+// mailer.js
 import nodemailer from "nodemailer";
 import { renderTemplate } from "./services/template.js";
 
@@ -7,17 +8,19 @@ const transporter = nodemailer.createTransport({
   secure: false,
   auth: {
     user: "tsudakunn@nifty.com",
-    pass: process.env.SENDGRID_API_KEY
+    pass: "FB54J657"
   }
 });
 
 export async function sendMail({ to, subject, template, data, from }) {
-  if (!template) throw new Error("Template is required");
+  if (!to || !subject || !template) {
+    throw new Error("Missing required fields");
+  }
 
-  const html = renderTemplate(template, data);
+  const html = renderTemplate(template, data || {});
 
   await transporter.sendMail({
-    from: from || `"Maptrapp" <tsudakunn@nifty.com>`,
+    from: from || `"Maptrapp" <sales@nifty.com>`,
     to,
     subject,
     html
