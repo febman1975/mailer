@@ -41,6 +41,8 @@ app.post("/send", async (req, res) => {
 
 /* PORT HANDLING — Railway compatible */
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
+
+// FIX: Added '0.0.0.0' so the Railway proxy can reach the container
+app.listen(PORT, '0.0.0.0', () => {
   console.log(`Mailer API listening on port ${PORT}`);
 });
