@@ -3,14 +3,13 @@ import path from "path";
 import Handlebars from "handlebars";
 
 export function renderTemplate(name, data = {}) {
-  const filePath = path.resolve("templates", `${name}.hbs`);
+  const file = path.resolve("templates", `${name}.hbs`);
 
-  if (!fs.existsSync(filePath)) {
+  if (!fs.existsSync(file)) {
     throw new Error(`Template not found: ${name}`);
   }
 
-  const source = fs.readFileSync(filePath, "utf8");
+  const source = fs.readFileSync(file, "utf8");
   const template = Handlebars.compile(source);
-
   return template(data);
 }
