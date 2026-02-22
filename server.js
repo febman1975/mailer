@@ -5,7 +5,7 @@ import { sendMail } from "./mailer.js";
 const app = express();
 app.use(bodyParser.json());
 
-// Root route - IMPORTANT: Railway uses this to check if the app is "Alive"
+// Root route
 app.get("/", (req, res) => {
   res.status(200).send("Mailer is Online");
 });
@@ -26,11 +26,9 @@ app.post("/send", async (req, res) => {
   }
 });
 
-// RAILWAY CONFIGURATION
-// We use process.env.PORT because Railway assigns a random port
+// RAILWAY FIX: Use process.env.PORT and bind specifically to 0.0.0.0
 const PORT = process.env.PORT || 3000;
 
-// We MUST use 0.0.0.0 so the Railway Proxy can find the container
 app.listen(PORT, '0.0.0.0', () => {
-  console.log(`Server strictly listening on 0.0.0.0:${PORT}`);
+  console.log(`Server is LIVE on 0.0.0.0:${PORT}`);
 });
