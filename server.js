@@ -5,29 +5,15 @@ import { sendMail } from "./mailer.js";
 
 const app = express();
 
-/* ============================
-   CONFIG
-============================ */
-const PORT = process.env.PORT || 3000;
-
-/* ============================
-   MIDDLEWARE
-============================ */
+/* Middleware */
 app.use(bodyParser.json());
 
-/* ============================
-   ROUTES
-============================ */
-
-// Root route (required for Railway)
+/* Root route (Railway hits this sometimes) */
 app.get("/", (req, res) => {
-  res.status(200).json({
-    status: "ok",
-    service: "mailer"
-  });
+  res.status(200).send("Mailer API is Online");
 });
 
-// Health check (match Railway healthcheck path)
+/* Health check */
 app.get("/health", (req, res) => {
   res.status(200).json({
     status: "healthy",
@@ -35,7 +21,7 @@ app.get("/health", (req, res) => {
   });
 });
 
-// Send mail
+/* Send email */
 app.post("/send", async (req, res) => {
   try {
     const { to, subject, template, data, from } = req.body;
@@ -46,35 +32,23 @@ app.post("/send", async (req, res) => {
       });
     }
 
-    const result = await sendMail({
-      to,
-      subject,
-      template,
-      data,
-      from
-    });
+    const result = await sendMail({ to, subject, template, data, from });
 
     res.json({
       success: true,
-      message: "Email sent",
       result
     });
   } catch (err) {
-    console.error("Mailer error:", err);
+    console.error("Send error:", err);
     res.status(500).json({
       success: false,
-      error: err.message || "Internal server error"
+      error: err.message
     });
   }
 });
 
-/* ============================
-   SERVER START
-============================ */
-const server = app.listen(PORT, "0.0.0.0", () => {
+/* 🚨 CRITICAL: Railway port binding */
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, "0.0.0.0", () => {
   console.log(`Mailer listening on 0.0.0.0:${PORT}`);
-});
-
-server.on("error", (err) => {
-  console.error("SERVER ERROR:", err);
 });
