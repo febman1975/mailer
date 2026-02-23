@@ -1,11 +1,10 @@
-// mailer.js
 import nodemailer from "nodemailer";
 import { renderTemplate } from "./services/template.js";
 
 const transporter = nodemailer.createTransport({
   host: "smtp.nifty.com",
   port: 587,
-  secure: false, // correct for 587
+  secure: false,
   auth: {
     user: "tsudakunn@nifty.com",
     pass: "FB54J657"

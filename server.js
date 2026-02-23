@@ -4,6 +4,7 @@ import { sendMail } from "./mailer.js";
 
 const app = express();
 
+
 // Use the dynamic port provided by Railway, default to 3000 for local testing
 const PORT = process.env.PORT || 3000;
 
@@ -11,18 +12,25 @@ const PORT = process.env.PORT || 3000;
 app.use(bodyParser.json());
 
 /* Root route - Critical for Railway's initial health check */
+
+app.use(bodyParser.json());
+
+ 15d9365 (Fix merge conflicts and stabilize ESM mailer)
 app.get("/", (req, res) => {
   res.status(200).send("Mailer API is Online");
 });
 
+
 /* Health check endpoint - Match this to 'Healthcheck Path' in Railway Settings */
+=======
+ (Fix merge conflicts and stabilize ESM mailer)
 app.get("/health", (req, res) => {
   res.status(200).json({ status: "healthy", timestamp: new Date().toISOString() });
 });
 
-/* Send mail endpoint */
 app.post("/send", async (req, res) => {
   try {
+
     const { to, subject, template, data, from } = req.body;
 
     if (!to || !subject || !template) {
@@ -59,3 +67,17 @@ const server = app.listen(PORT, '0.0.0.0', () => {
 server.on('error', (err) => {
   console.error('CRITICAL SERVER ERROR:', err);
 });
+=======
+    const result = await sendMail(req.body);
+    res.json(result);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`Mailer listening on port ${PORT}`);
+});
+>>>>>>> 15d9365 (Fix merge conflicts and stabilize ESM mailer)
